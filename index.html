@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pictionary por Equipos</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app">
+    <!-- Setup Screen -->
+    <section id="setup-screen" class="screen active">
+      <h1>Pictionary</h1>
+      <p class="subtitle">por Equipos</p>
+
+      <div class="setup-section">
+        <h2>Equipos</h2>
+        <div class="teams-config">
+          <div class="team-input">
+            <label for="team1-name">Equipo 1:</label>
+            <input type="text" id="team1-name" value="Equipo Azul" maxlength="20">
+          </div>
+          <div class="team-input">
+            <label for="team2-name">Equipo 2:</label>
+            <input type="text" id="team2-name" value="Equipo Rojo" maxlength="20">
+          </div>
+        </div>
+      </div>
+
+      <div class="setup-section">
+        <h2>Categoria</h2>
+        <div class="categories">
+          <button class="category-btn selected" data-category="todas">Todas</button>
+          <button class="category-btn" data-category="animales">Animales</button>
+          <button class="category-btn" data-category="objetos">Objetos</button>
+          <button class="category-btn" data-category="acciones">Acciones</button>
+          <button class="category-btn" data-category="peliculas">Peliculas</button>
+          <button class="category-btn" data-category="deportes">Deportes</button>
+          <button class="category-btn" data-category="comida">Comida</button>
+          <button class="category-btn" data-category="profesiones">Profesiones</button>
+        </div>
+      </div>
+
+      <div class="setup-section">
+        <h2>Tiempo por turno</h2>
+        <div class="time-options">
+          <button class="time-btn" data-time="30">30s</button>
+          <button class="time-btn selected" data-time="60">60s</button>
+          <button class="time-btn" data-time="90">90s</button>
+          <button class="time-btn" data-time="120">120s</button>
+        </div>
+      </div>
+
+      <div class="setup-section">
+        <h2>Puntos para ganar</h2>
+        <div class="points-options">
+          <button class="points-btn" data-points="5">5</button>
+          <button class="points-btn selected" data-points="10">10</button>
+          <button class="points-btn" data-points="15">15</button>
+          <button class="points-btn" data-points="20">20</button>
+        </div>
+      </div>
+
+      <button id="start-game-btn" class="primary-btn">Comenzar Juego</button>
+      <button id="help-btn" class="secondary-btn">Como se juega?</button>
+    </section>
+
+    <!-- Help Screen -->
+    <section id="help-screen" class="screen">
+      <h1>Como se juega</h1>
+      <div class="help-content">
+        <div class="help-step">
+          <span class="step-number">1</span>
+          <p>Divídanse en <strong>2 equipos</strong>. Pueden ponerle el nombre que quieran a cada uno.</p>
+        </div>
+        <div class="help-step">
+          <span class="step-number">2</span>
+          <p>Cada turno, un jugador del equipo es el <strong>dibujante</strong>. Solo esa persona puede ver la palabra en la pantalla.</p>
+        </div>
+        <div class="help-step">
+          <span class="step-number">3</span>
+          <p>El dibujante toca <strong>"Revelar Palabra"</strong> y luego <strong>"Iniciar Temporizador"</strong> para comenzar a dibujar (en papel, pizarra, o donde quieran).</p>
+        </div>
+        <div class="help-step">
+          <span class="step-number">4</span>
+          <p>El resto del equipo intenta <strong>adivinar</strong> lo que se está dibujando antes de que se acabe el tiempo.</p>
+        </div>
+        <div class="help-step">
+          <span class="step-number">5</span>
+          <p>Si adivinan, toquen <strong>"Adivinaron!"</strong> para sumar un punto. Si no pueden, toquen <strong>"Pasar"</strong>.</p>
+        </div>
+        <div class="help-step">
+          <span class="step-number">6</span>
+          <p>El primer equipo en llegar a los <strong>puntos objetivo</strong> gana la partida.</p>
+        </div>
+        <div class="help-rules">
+          <h3>Reglas del dibujante</h3>
+          <ul>
+            <li>No puede hablar, ni hacer gestos, ni escribir letras o números</li>
+            <li>Solo puede dibujar</li>
+            <li>No puede señalar objetos de la sala</li>
+          </ul>
+        </div>
+      </div>
+      <button id="back-from-help-btn" class="primary-btn">Entendido!</button>
+    </section>
+
+    <!-- Game Screen -->
+    <section id="game-screen" class="screen">
+      <div class="scoreboard">
+        <div class="team-score" id="team1-score-display">
+          <span class="team-name" id="team1-label">Equipo Azul</span>
+          <span class="score" id="team1-score">0</span>
+        </div>
+        <div class="vs">VS</div>
+        <div class="team-score" id="team2-score-display">
+          <span class="team-name" id="team2-label">Equipo Rojo</span>
+          <span class="score" id="team2-score">0</span>
+        </div>
+      </div>
+
+      <div class="turn-indicator">
+        <span>Turno de: </span>
+        <strong id="current-team-name">Equipo Azul</strong>
+      </div>
+
+      <div class="word-area">
+        <div id="word-display" class="word-hidden">
+          <span class="word-label">Palabra:</span>
+          <span id="the-word" class="the-word">???</span>
+        </div>
+        <p class="word-hint">Solo el dibujante debe ver la palabra</p>
+      </div>
+
+      <div class="timer-area">
+        <div id="timer-circle" class="timer-circle">
+          <span id="timer-value">60</span>
+        </div>
+      </div>
+
+      <div class="game-controls">
+        <button id="reveal-word-btn" class="action-btn reveal-btn">Revelar Palabra</button>
+        <button id="start-timer-btn" class="action-btn timer-btn" disabled>Iniciar Temporizador</button>
+        <button id="correct-btn" class="action-btn correct-btn" disabled>Adivinaron!</button>
+        <button id="skip-btn" class="action-btn skip-btn" disabled>Pasar</button>
+      </div>
+
+      <div class="bottom-controls">
+        <button id="reset-scores-btn" class="secondary-btn">Resetear Puntos</button>
+        <button id="back-to-setup-btn" class="secondary-btn">Volver al Menu</button>
+      </div>
+    </section>
+
+    <!-- Winner Screen -->
+    <section id="winner-screen" class="screen">
+      <div class="winner-content">
+        <h1 class="winner-title">Ganador!</h1>
+        <p id="winner-team-name" class="winner-name">Equipo Azul</p>
+        <div class="confetti-container" id="confetti"></div>
+      </div>
+      <button id="play-again-btn" class="primary-btn">Jugar de Nuevo</button>
+    </section>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
