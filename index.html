@@ -44,20 +44,10 @@
       <div class="setup-section">
         <h2>Tiempo por turno</h2>
         <div class="time-options">
+          <button class="time-btn" data-time="15">15s</button>
           <button class="time-btn" data-time="30">30s</button>
+          <button class="time-btn" data-time="45">45s</button>
           <button class="time-btn selected" data-time="60">60s</button>
-          <button class="time-btn" data-time="90">90s</button>
-          <button class="time-btn" data-time="120">120s</button>
-        </div>
-      </div>
-
-      <div class="setup-section">
-        <h2>Puntos para ganar</h2>
-        <div class="points-options">
-          <button class="points-btn" data-points="5">5</button>
-          <button class="points-btn selected" data-points="10">10</button>
-          <button class="points-btn" data-points="15">15</button>
-          <button class="points-btn" data-points="20">20</button>
         </div>
       </div>
 
@@ -75,23 +65,23 @@
         </div>
         <div class="help-step">
           <span class="step-number">2</span>
-          <p>Cada turno, un jugador del equipo es el <strong>dibujante</strong>. Solo esa persona puede ver la palabra en la pantalla.</p>
+          <p>Cada turno, un jugador del equipo es el <strong>dibujante</strong>. Toma el celular/pantalla y toca <strong>"Iniciar Ronda"</strong>.</p>
         </div>
         <div class="help-step">
           <span class="step-number">3</span>
-          <p>El dibujante toca <strong>"Revelar Palabra"</strong> y luego <strong>"Iniciar Temporizador"</strong> para comenzar a dibujar (en papel, pizarra, o donde quieran).</p>
+          <p>Aparece una palabra y arranca el tiempo. El dibujante dibuja (en papel, pizarra, etc.) y su equipo intenta <strong>adivinar</strong>.</p>
         </div>
         <div class="help-step">
           <span class="step-number">4</span>
-          <p>El resto del equipo intenta <strong>adivinar</strong> lo que se está dibujando antes de que se acabe el tiempo.</p>
+          <p>Si adivinan, el dibujante toca <strong>"Adivinaron!"</strong> (suma punto) y aparece la siguiente palabra. Si no puede dibujarla, toca <strong>"Pasar"</strong> y sigue con otra.</p>
         </div>
         <div class="help-step">
           <span class="step-number">5</span>
-          <p>Si adivinan, toquen <strong>"Adivinaron!"</strong> para sumar un punto. Si no pueden, toquen <strong>"Pasar"</strong>.</p>
+          <p>El objetivo es adivinar la <strong>mayor cantidad de palabras</strong> antes de que se acabe el tiempo.</p>
         </div>
         <div class="help-step">
           <span class="step-number">6</span>
-          <p>El primer equipo en llegar a los <strong>puntos objetivo</strong> gana la partida.</p>
+          <p>Cuando termina el tiempo, pasa el turno al otro equipo. Cuando quieran terminar, toquen <strong>"Finalizar Juego"</strong> para ver los resultados.</p>
         </div>
         <div class="help-rules">
           <h3>Reglas del dibujante</h3>
@@ -124,38 +114,65 @@
         <strong id="current-team-name">Equipo Azul</strong>
       </div>
 
-      <div class="word-area">
-        <div id="word-display" class="word-hidden">
-          <span class="word-label">Palabra:</span>
-          <span id="the-word" class="the-word">???</span>
-        </div>
-        <p class="word-hint">Solo el dibujante debe ver la palabra</p>
-      </div>
-
       <div class="timer-area">
         <div id="timer-circle" class="timer-circle">
           <span id="timer-value">60</span>
         </div>
       </div>
 
+      <div class="word-area">
+        <div id="word-display" class="word-hidden">
+          <span class="word-label">Palabra:</span>
+          <span id="the-word" class="the-word">???</span>
+        </div>
+      </div>
+
       <div class="game-controls">
-        <button id="reveal-word-btn" class="action-btn reveal-btn">Revelar Palabra</button>
-        <button id="start-timer-btn" class="action-btn timer-btn" disabled>Iniciar Temporizador</button>
-        <button id="correct-btn" class="action-btn correct-btn" disabled>Adivinaron!</button>
-        <button id="skip-btn" class="action-btn skip-btn" disabled>Pasar</button>
+        <button id="start-round-btn" class="action-btn timer-btn">Iniciar Ronda</button>
+        <button id="correct-btn" class="action-btn correct-btn" style="display:none;">Adivinaron!</button>
+        <button id="skip-btn" class="action-btn skip-btn" style="display:none;">Pasar</button>
+      </div>
+
+      <div id="round-summary" class="round-summary" style="display:none;">
+        <p>Tiempo! <strong id="round-points">0</strong> puntos esta ronda</p>
+        <button id="next-turn-btn" class="action-btn timer-btn">Siguiente Turno</button>
       </div>
 
       <div class="bottom-controls">
-        <button id="reset-scores-btn" class="secondary-btn">Resetear Puntos</button>
+        <button id="end-game-btn" class="secondary-btn">Finalizar Juego</button>
         <button id="back-to-setup-btn" class="secondary-btn">Volver al Menu</button>
       </div>
     </section>
 
-    <!-- Winner Screen -->
-    <section id="winner-screen" class="screen">
-      <div class="winner-content">
-        <h1 class="winner-title">Ganador!</h1>
-        <p id="winner-team-name" class="winner-name">Equipo Azul</p>
+    <!-- Results Screen -->
+    <section id="results-screen" class="screen">
+      <div class="results-content">
+        <h1 class="results-title" id="results-title">Resultados</h1>
+        <div id="results-winner" class="results-winner"></div>
+
+        <div class="results-totals">
+          <div class="result-total team1-total">
+            <span class="result-team-name" id="results-team1-name">Equipo Azul</span>
+            <span class="result-team-score" id="results-team1-total">0</span>
+          </div>
+          <div class="result-total team2-total">
+            <span class="result-team-name" id="results-team2-name">Equipo Rojo</span>
+            <span class="result-team-score" id="results-team2-total">0</span>
+          </div>
+        </div>
+
+        <div class="results-rounds">
+          <h3>Detalle por ronda</h3>
+          <div class="rounds-table">
+            <div class="rounds-header">
+              <span>Ronda</span>
+              <span id="rounds-header-team1">Eq. Azul</span>
+              <span id="rounds-header-team2">Eq. Rojo</span>
+            </div>
+            <div id="rounds-body"></div>
+          </div>
+        </div>
+
         <div class="confetti-container" id="confetti"></div>
       </div>
       <button id="play-again-btn" class="primary-btn">Jugar de Nuevo</button>

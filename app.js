@@ -78,18 +78,20 @@ let gameState = {
   currentTeam: 1,
   selectedCategory: 'todas',
   timePerTurn: 60,
-  pointsToWin: 10,
   currentWord: '',
   timerInterval: null,
   timeRemaining: 60,
   isTimerRunning: false,
+  roundPoints: 0,
+  roundNumber: 0,
+  roundHistory: [], // { round, team, points }
   usedWords: new Set()
 };
 
 // ==================== DOM ELEMENTS ====================
 const setupScreen = document.getElementById('setup-screen');
 const gameScreen = document.getElementById('game-screen');
-const winnerScreen = document.getElementById('winner-screen');
+const resultsScreen = document.getElementById('results-screen');
 const helpScreen = document.getElementById('help-screen');
 
 const team1NameInput = document.getElementById('team1-name');
@@ -106,16 +108,19 @@ const currentTeamName = document.getElementById('current-team-name');
 
 const wordDisplay = document.getElementById('word-display');
 const theWord = document.getElementById('the-word');
-const revealWordBtn = document.getElementById('reveal-word-btn');
-const startTimerBtn = document.getElementById('start-timer-btn');
+const startRoundBtn = document.getElementById('start-round-btn');
 const correctBtn = document.getElementById('correct-btn');
 const skipBtn = document.getElementById('skip-btn');
 
 const timerCircle = document.getElementById('timer-circle');
 const timerValue = document.getElementById('timer-value');
 
+const roundSummary = document.getElementById('round-summary');
+const roundPointsEl = document.getElementById('round-points');
+const nextTurnBtn = document.getElementById('next-turn-btn');
+
+const endGameBtn = document.getElementById('end-game-btn');
 const backToSetupBtn = document.getElementById('back-to-setup-btn');
-const winnerTeamName = document.getElementById('winner-team-name');
 const playAgainBtn = document.getElementById('play-again-btn');
 
 // ==================== SETUP HANDLERS ====================
@@ -132,14 +137,6 @@ document.querySelectorAll('.time-btn').forEach(btn => {
     document.querySelectorAll('.time-btn').forEach(b => b.classList.remove('selected'));
     btn.classList.add('selected');
     gameState.timePerTurn = parseInt(btn.dataset.time);
-  });
-});
-
-document.querySelectorAll('.points-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('.points-btn').forEach(b => b.classList.remove('selected'));
-    btn.classList.add('selected');
-    gameState.pointsToWin = parseInt(btn.dataset.points);
   });
 });
 
@@ -168,7 +165,7 @@ function getRandomWord() {
 }
 
 function showScreen(screen) {
-  [setupScreen, gameScreen, winnerScreen, helpScreen].forEach(s => s.classList.remove('active'));
+  [setupScreen, gameScreen, resultsScreen, helpScreen].forEach(s => s.classList.remove('active'));
   screen.classList.add('active');
 }
 
@@ -178,6 +175,8 @@ function startGame() {
   gameState.team1Score = 0;
   gameState.team2Score = 0;
   gameState.currentTeam = 1;
+  gameState.roundNumber = 0;
+  gameState.roundHistory = [];
   gameState.usedWords.clear();
 
   team1Label.textContent = gameState.team1Name;
@@ -199,8 +198,7 @@ function updateTurnDisplay() {
 }
 
 function resetTurn() {
-  // Reset word
-  gameState.currentWord = getRandomWord();
+  // Hide word
   theWord.textContent = '???';
   wordDisplay.classList.add('word-hidden');
 
@@ -208,49 +206,38 @@ function resetTurn() {
   clearInterval(gameState.timerInterval);
   gameState.isTimerRunning = false;
   gameState.timeRemaining = gameState.timePerTurn;
+  gameState.roundPoints = 0;
   timerValue.textContent = gameState.timePerTurn;
   timerCircle.className = 'timer-circle';
 
-  // Reset buttons
-  revealWordBtn.disabled = false;
-  startTimerBtn.disabled = true;
-  correctBtn.disabled = true;
-  skipBtn.disabled = true;
+  // Show start button, hide playing buttons
+  startRoundBtn.style.display = '';
+  correctBtn.style.display = 'none';
+  skipBtn.style.display = 'none';
+  roundSummary.style.display = 'none';
 }
 
-function revealWord() {
-  if (wordDisplay.classList.contains('word-hidden')) {
-    // Show the word
-    theWord.textContent = gameState.currentWord;
-    wordDisplay.classList.remove('word-hidden');
-    revealWordBtn.textContent = 'Ocultar Palabra';
-    revealWordBtn.classList.add('hide-mode');
-    startTimerBtn.disabled = true;
-  } else {
-    // Hide the word
-    theWord.textContent = '???';
-    wordDisplay.classList.add('word-hidden');
-    revealWordBtn.textContent = 'Revelar Palabra';
-    revealWordBtn.classList.remove('hide-mode');
-    startTimerBtn.disabled = false;
-  }
-}
+function startRound() {
+  gameState.roundNumber++;
 
-function startTimer() {
-  if (gameState.isTimerRunning) return;
+  // Show word and start timer immediately
+  gameState.currentWord = getRandomWord();
+  theWord.textContent = gameState.currentWord;
+  wordDisplay.classList.remove('word-hidden');
 
+  // Switch buttons
+  startRoundBtn.style.display = 'none';
+  correctBtn.style.display = '';
+  skipBtn.style.display = '';
+
+  // Start timer
   gameState.isTimerRunning = true;
-  startTimerBtn.disabled = true;
-  revealWordBtn.disabled = true;
-  correctBtn.disabled = false;
-  skipBtn.disabled = false;
   timerCircle.classList.add('running');
 
   gameState.timerInterval = setInterval(() => {
     gameState.timeRemaining--;
     timerValue.textContent = gameState.timeRemaining;
 
-    // Visual feedback
     if (gameState.timeRemaining <= 10) {
       timerCircle.className = 'timer-circle danger';
     } else if (gameState.timeRemaining <= 20) {
@@ -268,21 +255,27 @@ function timeUp() {
   gameState.isTimerRunning = false;
   timerValue.textContent = '0';
 
-  // Play a visual shake
-  timerCircle.style.animation = 'pulse 0.2s 3';
-  setTimeout(() => {
-    timerCircle.style.animation = '';
-  }, 600);
+  // Save round to history
+  gameState.roundHistory.push({
+    round: gameState.roundNumber,
+    team: gameState.currentTeam,
+    points: gameState.roundPoints
+  });
 
-  // Switch turns
-  switchTeam();
+  // Hide playing controls
+  correctBtn.style.display = 'none';
+  skipBtn.style.display = 'none';
+  wordDisplay.classList.add('word-hidden');
+  theWord.textContent = '???';
+
+  // Show round summary
+  roundPointsEl.textContent = gameState.roundPoints;
+  roundSummary.style.display = '';
 }
 
 function correctGuess() {
-  clearInterval(gameState.timerInterval);
-  gameState.isTimerRunning = false;
-
   // Add point
+  gameState.roundPoints++;
   if (gameState.currentTeam === 1) {
     gameState.team1Score++;
     team1ScoreEl.textContent = gameState.team1Score;
@@ -291,35 +284,105 @@ function correctGuess() {
     team2ScoreEl.textContent = gameState.team2Score;
   }
 
-  // Check for winner
-  if (gameState.team1Score >= gameState.pointsToWin) {
-    showWinner(gameState.team1Name);
-    return;
-  }
-  if (gameState.team2Score >= gameState.pointsToWin) {
-    showWinner(gameState.team2Name);
-    return;
-  }
-
-  // Switch teams
-  switchTeam();
+  // Next word (timer keeps running)
+  gameState.currentWord = getRandomWord();
+  theWord.textContent = gameState.currentWord;
 }
 
 function skipWord() {
-  clearInterval(gameState.timerInterval);
-  gameState.isTimerRunning = false;
-  switchTeam();
+  // Next word without points (timer keeps running)
+  gameState.currentWord = getRandomWord();
+  theWord.textContent = gameState.currentWord;
 }
 
-function switchTeam() {
+function nextTurn() {
   gameState.currentTeam = gameState.currentTeam === 1 ? 2 : 1;
   updateTurnDisplay();
   resetTurn();
 }
 
-function showWinner(teamName) {
-  winnerTeamName.textContent = teamName;
-  showScreen(winnerScreen);
+function endGame() {
+  // If a round is in progress, discard it (revert points)
+  if (gameState.isTimerRunning) {
+    clearInterval(gameState.timerInterval);
+    gameState.isTimerRunning = false;
+
+    // Revert the points scored in this incomplete round
+    if (gameState.currentTeam === 1) {
+      gameState.team1Score -= gameState.roundPoints;
+    } else {
+      gameState.team2Score -= gameState.roundPoints;
+    }
+  }
+
+  // Check if rounds are uneven
+  const team1Rounds = gameState.roundHistory.filter(r => r.team === 1).length;
+  const team2Rounds = gameState.roundHistory.filter(r => r.team === 2).length;
+
+  if (team1Rounds !== team2Rounds) {
+    const fewerTeam = team1Rounds < team2Rounds ? gameState.team1Name : gameState.team2Name;
+    const diff = Math.abs(team1Rounds - team2Rounds);
+    const roundWord = diff === 1 ? 'ronda' : 'rondas';
+    const confirmed = confirm(
+      `"${fewerTeam}" jugó ${diff} ${roundWord} menos que el otro equipo. ¿Seguro que quieres finalizar? El puntaje podría no ser justo.`
+    );
+    if (!confirmed) {
+      // Restore state so they can keep playing
+      resetTurn();
+      return;
+    }
+  }
+
+  showResults();
+}
+
+function showResults() {
+  // Set team names
+  document.getElementById('results-team1-name').textContent = gameState.team1Name;
+  document.getElementById('results-team2-name').textContent = gameState.team2Name;
+  document.getElementById('results-team1-total').textContent = gameState.team1Score;
+  document.getElementById('results-team2-total').textContent = gameState.team2Score;
+  document.getElementById('rounds-header-team1').textContent = gameState.team1Name;
+  document.getElementById('rounds-header-team2').textContent = gameState.team2Name;
+
+  // Determine winner
+  const winnerEl = document.getElementById('results-winner');
+  if (gameState.team1Score > gameState.team2Score) {
+    winnerEl.textContent = 'Ganador: ' + gameState.team1Name + '!';
+    winnerEl.className = 'results-winner winner-team1';
+  } else if (gameState.team2Score > gameState.team1Score) {
+    winnerEl.textContent = 'Ganador: ' + gameState.team2Name + '!';
+    winnerEl.className = 'results-winner winner-team2';
+  } else {
+    winnerEl.textContent = 'Empate!';
+    winnerEl.className = 'results-winner winner-tie';
+  }
+
+  // Build rounds table
+  const roundsBody = document.getElementById('rounds-body');
+  roundsBody.innerHTML = '';
+
+  // Group rounds in pairs (team1 then team2 per round number)
+  const roundPairs = {};
+  gameState.roundHistory.forEach(entry => {
+    const pairKey = Math.ceil(entry.round / 2);
+    if (!roundPairs[pairKey]) roundPairs[pairKey] = { team1: '-', team2: '-' };
+    if (entry.team === 1) roundPairs[pairKey].team1 = entry.points;
+    else roundPairs[pairKey].team2 = entry.points;
+  });
+
+  Object.keys(roundPairs).forEach(key => {
+    const row = document.createElement('div');
+    row.className = 'rounds-row';
+    row.innerHTML = `
+      <span>${key}</span>
+      <span>${roundPairs[key].team1}</span>
+      <span>${roundPairs[key].team2}</span>
+    `;
+    roundsBody.appendChild(row);
+  });
+
+  showScreen(resultsScreen);
   launchConfetti();
 }
 
@@ -343,35 +406,21 @@ function launchConfetti() {
   }
 }
 
-function playAgain() {
-  showScreen(setupScreen);
-}
-
 function backToSetup() {
   clearInterval(gameState.timerInterval);
   gameState.isTimerRunning = false;
   showScreen(setupScreen);
 }
 
-function resetScores() {
-  gameState.team1Score = 0;
-  gameState.team2Score = 0;
-  team1ScoreEl.textContent = '0';
-  team2ScoreEl.textContent = '0';
-  gameState.currentTeam = 1;
-  updateTurnDisplay();
-  resetTurn();
-}
-
 // ==================== EVENT LISTENERS ====================
 startGameBtn.addEventListener('click', startGame);
-revealWordBtn.addEventListener('click', revealWord);
-startTimerBtn.addEventListener('click', startTimer);
+startRoundBtn.addEventListener('click', startRound);
 correctBtn.addEventListener('click', correctGuess);
 skipBtn.addEventListener('click', skipWord);
+nextTurnBtn.addEventListener('click', nextTurn);
+endGameBtn.addEventListener('click', endGame);
 backToSetupBtn.addEventListener('click', backToSetup);
-playAgainBtn.addEventListener('click', playAgain);
-document.getElementById('reset-scores-btn').addEventListener('click', resetScores);
+playAgainBtn.addEventListener('click', () => showScreen(setupScreen));
 
 document.getElementById('help-btn').addEventListener('click', () => showScreen(helpScreen));
 document.getElementById('back-from-help-btn').addEventListener('click', () => showScreen(setupScreen));
