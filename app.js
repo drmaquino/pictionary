@@ -567,9 +567,16 @@ function launchConfetti() {
 }
 
 function backToSetup() {
-  clearInterval(gameState.timerInterval);
-  gameState.isTimerRunning = false;
-  showScreen(setupScreen);
+  // Revert points scored in this round if timer is running
+  if (gameState.isTimerRunning) {
+    clearInterval(gameState.timerInterval);
+    gameState.isTimerRunning = false;
+    gameState.teams[gameState.currentTeamIndex].score -= gameState.roundPoints;
+    document.getElementById(`team-score-${gameState.currentTeamIndex}`).textContent =
+      gameState.teams[gameState.currentTeamIndex].score;
+    gameState.roundNumber--;
+  }
+  resetTurn();
 }
 
 // ==================== EVENT LISTENERS ====================
