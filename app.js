@@ -1,7 +1,128 @@
+// ==================== CONFIG & INITIALIZATION ====================
+let audioCtx = null;
+
+function getAudioContext() {
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+  return audioCtx;
+}
+
+function playTick() {
+  const ctx = getAudioContext();
+  const oscillator = ctx.createOscillator();
+  const gain = ctx.createGain();
+
+  oscillator.connect(gain);
+  gain.connect(ctx.destination);
+
+  oscillator.type = 'sine';
+  oscillator.frequency.setValueAtTime(880, ctx.currentTime);
+  oscillator.frequency.exponentialRampToValueAtTime(440, ctx.currentTime + 0.1);
+
+  gain.gain.setValueAtTime(0.3, ctx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.15);
+
+  oscillator.start(ctx.currentTime);
+  oscillator.stop(ctx.currentTime + 0.15);
+}
+
+function playGong() {
+  const ctx = getAudioContext();
+
+  // Layer 1: low bell tone
+  const osc1 = ctx.createOscillator();
+  const gain1 = ctx.createGain();
+  osc1.connect(gain1);
+  gain1.connect(ctx.destination);
+  osc1.type = 'sine';
+  osc1.frequency.setValueAtTime(150, ctx.currentTime);
+  gain1.gain.setValueAtTime(0.4, ctx.currentTime);
+  gain1.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 1.5);
+  osc1.start(ctx.currentTime);
+  osc1.stop(ctx.currentTime + 1.5);
+
+  // Layer 2: mid harmonic
+  const osc2 = ctx.createOscillator();
+  const gain2 = ctx.createGain();
+  osc2.connect(gain2);
+  gain2.connect(ctx.destination);
+  osc2.type = 'sine';
+  osc2.frequency.setValueAtTime(300, ctx.currentTime);
+  osc2.frequency.exponentialRampToValueAtTime(200, ctx.currentTime + 1.0);
+  gain2.gain.setValueAtTime(0.3, ctx.currentTime);
+  gain2.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 1.0);
+  osc2.start(ctx.currentTime);
+  osc2.stop(ctx.currentTime + 1.0);
+
+  // Layer 3: high shimmer
+  const osc3 = ctx.createOscillator();
+  const gain3 = ctx.createGain();
+  osc3.connect(gain3);
+  gain3.connect(ctx.destination);
+  osc3.type = 'triangle';
+  osc3.frequency.setValueAtTime(600, ctx.currentTime);
+  osc3.frequency.exponentialRampToValueAtTime(400, ctx.currentTime + 0.8);
+  gain3.gain.setValueAtTime(0.15, ctx.currentTime);
+  gain3.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.8);
+  osc3.start(ctx.currentTime);
+  osc3.stop(ctx.currentTime + 0.8);
+}
+function initGame() {
+  // Set default team names in inputs
+  team1NameInput.value = CONFIG.teams.defaultNames[0];
+  team2NameInput.value = CONFIG.teams.defaultNames[1];
+  team1NameInput.maxLength = CONFIG.teams.maxNameLength;
+  team2NameInput.maxLength = CONFIG.teams.maxNameLength;
+
+  // Render category buttons
+  renderCategories();
+
+  // Render time buttons
+  renderTimeOptions();
+
+  // Set initial game state with config defaults
+  gameState.timePerTurn = CONFIG.timer.default;
+}
+
+function renderCategories() {
+  const container = document.getElementById('categories-container');
+  container.innerHTML = '';
+  CONFIG.categories.forEach((cat, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'category-btn' + (i === 0 ? ' selected' : '');
+    btn.dataset.category = cat.id;
+    btn.textContent = cat.label;
+    btn.addEventListener('click', () => {
+      container.querySelectorAll('.category-btn').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      gameState.selectedCategory = btn.dataset.category;
+    });
+    container.appendChild(btn);
+  });
+}
+
+function renderTimeOptions() {
+  const container = document.getElementById('time-options-container');
+  container.innerHTML = '';
+  CONFIG.timer.options.forEach(time => {
+    const btn = document.createElement('button');
+    btn.className = 'time-btn' + (time === CONFIG.timer.default ? ' selected' : '');
+    btn.dataset.time = time;
+    btn.textContent = time + 's';
+    btn.addEventListener('click', () => {
+      container.querySelectorAll('.time-btn').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      gameState.timePerTurn = parseInt(btn.dataset.time);
+    });
+    container.appendChild(btn);
+  });
+}
+
 // ==================== GAME STATE ====================
 let gameState = {
-  team1Name: 'Equipo Azul',
-  team2Name: 'Equipo Rojo',
+  team1Name: '',
+  team2Name: '',
   team1Score: 0,
   team2Score: 0,
   currentTeam: 1,
@@ -13,7 +134,7 @@ let gameState = {
   isTimerRunning: false,
   roundPoints: 0,
   roundNumber: 0,
-  roundHistory: [], // { round, team, points }
+  roundHistory: [],
   usedWords: new Set()
 };
 
@@ -52,23 +173,6 @@ const endGameBtn = document.getElementById('end-game-btn');
 const backToSetupBtn = document.getElementById('back-to-setup-btn');
 const playAgainBtn = document.getElementById('play-again-btn');
 
-// ==================== SETUP HANDLERS ====================
-document.querySelectorAll('.category-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('selected'));
-    btn.classList.add('selected');
-    gameState.selectedCategory = btn.dataset.category;
-  });
-});
-
-document.querySelectorAll('.time-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('.time-btn').forEach(b => b.classList.remove('selected'));
-    btn.classList.add('selected');
-    gameState.timePerTurn = parseInt(btn.dataset.time);
-  });
-});
-
 // ==================== GAME LOGIC ====================
 function getRandomWord() {
   let pool = [];
@@ -99,8 +203,8 @@ function showScreen(screen) {
 }
 
 function startGame() {
-  gameState.team1Name = team1NameInput.value.trim() || 'Equipo Azul';
-  gameState.team2Name = team2NameInput.value.trim() || 'Equipo Rojo';
+  gameState.team1Name = team1NameInput.value.trim() || CONFIG.teams.defaultNames[0];
+  gameState.team2Name = team2NameInput.value.trim() || CONFIG.teams.defaultNames[1];
   gameState.team1Score = 0;
   gameState.team2Score = 0;
   gameState.currentTeam = 1;
@@ -167,13 +271,19 @@ function startRound() {
     gameState.timeRemaining--;
     timerValue.textContent = gameState.timeRemaining;
 
-    if (gameState.timeRemaining <= 10) {
+    if (gameState.timeRemaining <= CONFIG.timer.dangerThreshold) {
       timerCircle.className = 'timer-circle danger';
-    } else if (gameState.timeRemaining <= 20) {
+    } else if (gameState.timeRemaining <= CONFIG.timer.warningThreshold) {
       timerCircle.className = 'timer-circle warning';
     }
 
+    // Play tick sound in the last N seconds
+    if (gameState.timeRemaining > 0 && gameState.timeRemaining <= CONFIG.timer.tickSoundFromSeconds) {
+      playTick();
+    }
+
     if (gameState.timeRemaining <= 0) {
+      playGong();
       timeUp();
     }
   }, 1000);
@@ -319,9 +429,10 @@ function launchConfetti() {
   const container = document.getElementById('confetti');
   container.innerHTML = '';
 
-  const colors = ['#6c5ce7', '#0984e3', '#d63031', '#00b894', '#fdcb6e', '#e17055', '#00cec9'];
+  const colors = CONFIG.confetti.colors;
+  const count = CONFIG.confetti.count;
 
-  for (let i = 0; i < 50; i++) {
+  for (let i = 0; i < count; i++) {
     const piece = document.createElement('div');
     piece.classList.add('confetti-piece');
     piece.style.left = Math.random() * 100 + '%';
@@ -353,3 +464,6 @@ playAgainBtn.addEventListener('click', () => showScreen(setupScreen));
 
 document.getElementById('help-btn').addEventListener('click', () => showScreen(helpScreen));
 document.getElementById('back-from-help-btn').addEventListener('click', () => showScreen(setupScreen));
+
+// ==================== BOOT ====================
+initGame();

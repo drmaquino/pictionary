@@ -18,37 +18,23 @@
         <div class="teams-config">
           <div class="team-input">
             <label for="team1-name">Equipo 1:</label>
-            <input type="text" id="team1-name" value="Equipo Azul" maxlength="20">
+            <input type="text" id="team1-name">
           </div>
           <div class="team-input">
             <label for="team2-name">Equipo 2:</label>
-            <input type="text" id="team2-name" value="Equipo Rojo" maxlength="20">
+            <input type="text" id="team2-name">
           </div>
         </div>
       </div>
 
       <div class="setup-section">
         <h2>Categoria</h2>
-        <div class="categories">
-          <button class="category-btn selected" data-category="todas">Todas</button>
-          <button class="category-btn" data-category="animales">Animales</button>
-          <button class="category-btn" data-category="objetos">Objetos</button>
-          <button class="category-btn" data-category="acciones">Acciones</button>
-          <button class="category-btn" data-category="peliculas">Peliculas</button>
-          <button class="category-btn" data-category="deportes">Deportes</button>
-          <button class="category-btn" data-category="comida">Comida</button>
-          <button class="category-btn" data-category="profesiones">Profesiones</button>
-        </div>
+        <div class="categories" id="categories-container"></div>
       </div>
 
       <div class="setup-section">
         <h2>Tiempo por turno</h2>
-        <div class="time-options">
-          <button class="time-btn" data-time="15">15s</button>
-          <button class="time-btn" data-time="30">30s</button>
-          <button class="time-btn" data-time="45">45s</button>
-          <button class="time-btn selected" data-time="60">60s</button>
-        </div>
+        <div class="time-options" id="time-options-container"></div>
       </div>
 
       <button id="start-game-btn" class="primary-btn">Comenzar Juego</button>
@@ -179,6 +165,7 @@
     </section>
   </div>
 
+  <script src="config.js"></script>
   <script src="words.js"></script>
   <script src="app.js"></script>
 </body>
