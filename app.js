@@ -348,6 +348,7 @@ function resetTurn() {
   correctBtn.style.display = 'none';
   skipBtn.style.display = 'none';
   roundSummary.style.display = 'none';
+  backToSetupBtn.style.display = 'none';
 }
 
 function startRound() {
@@ -366,6 +367,7 @@ function startRound() {
   startRoundBtn.style.display = 'none';
   correctBtn.style.display = '';
   skipBtn.style.display = '';
+  backToSetupBtn.style.display = '';
 
   gameState.isTimerRunning = true;
   timerCircle.classList.add('running');
