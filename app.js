@@ -1,6 +1,38 @@
 // ==================== AUDIO ====================
 let audioCtx = null;
 
+// ==================== DIALOG HELPERS ====================
+function showDialog(message, { showCancel = false, confirmText = 'Aceptar', cancelText = 'Cancelar' } = {}) {
+  return new Promise(resolve => {
+    const dialog = document.getElementById('game-dialog');
+    const msgEl = document.getElementById('dialog-message');
+    const confirmBtn = document.getElementById('dialog-confirm');
+    const cancelBtn = document.getElementById('dialog-cancel');
+
+    msgEl.textContent = message;
+    confirmBtn.textContent = confirmText;
+    cancelBtn.textContent = cancelText;
+    cancelBtn.style.display = showCancel ? '' : 'none';
+
+    function cleanup(result) {
+      confirmBtn.removeEventListener('click', onConfirm);
+      cancelBtn.removeEventListener('click', onCancel);
+      dialog.removeEventListener('cancel', onCancel);
+      dialog.close();
+      resolve(result);
+    }
+
+    function onConfirm() { cleanup(true); }
+    function onCancel() { cleanup(false); }
+
+    confirmBtn.addEventListener('click', onConfirm);
+    cancelBtn.addEventListener('click', onCancel);
+    dialog.addEventListener('cancel', onCancel); // ESC key
+
+    dialog.showModal();
+  });
+}
+
 function getAudioContext() {
   if (!audioCtx) {
     audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -268,7 +300,7 @@ function startGame() {
   // Validate that all teams have names
   const emptyTeams = setupTeams.filter(t => !t.name.trim());
   if (emptyTeams.length > 0) {
-    alert('Todos los equipos necesitan un nombre para comenzar.');
+    showDialog('Todos los equipos necesitan un nombre para comenzar.');
     return;
   }
 
@@ -434,7 +466,7 @@ function nextTurn() {
   resetTurn();
 }
 
-function endGame() {
+async function endGame() {
   if (gameState.isTimerRunning) {
     clearInterval(gameState.timerInterval);
     gameState.isTimerRunning = false;
@@ -457,8 +489,9 @@ function endGame() {
         .map(t => t.name);
       const diff = maxRounds - minRounds;
       const roundWord = diff === 1 ? 'ronda' : 'rondas';
-      const confirmed = confirm(
-        `${fewerTeams.join(', ')} jugó ${diff} ${roundWord} menos. ¿Seguro que quieres finalizar? El puntaje podría no ser justo.`
+      const confirmed = await showDialog(
+        `${fewerTeams.join(', ')} jugó ${diff} ${roundWord} menos. ¿Seguro que quieres finalizar? El puntaje podría no ser justo.`,
+        { showCancel: true, confirmText: 'Finalizar', cancelText: 'Seguir jugando' }
       );
       if (!confirmed) {
         resetTurn();
