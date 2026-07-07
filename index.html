@@ -19,16 +19,6 @@
         <button type="button" id="add-team-btn" class="add-team-btn">+ Agregar equipo</button>
       </div>
 
-      <div class="setup-section">
-        <h2>Categoria</h2>
-        <div class="categories" id="categories-container"></div>
-      </div>
-
-      <div class="setup-section">
-        <h2>Tiempo por turno</h2>
-        <div class="time-options" id="time-options-container"></div>
-      </div>
-
       <button id="start-game-btn" class="primary-btn">Comenzar Juego</button>
       <button id="help-btn" class="secondary-btn">Como se juega?</button>
     </section>
@@ -80,6 +70,17 @@
       <div class="turn-indicator">
         <span>Turno de: </span>
         <strong id="current-team-name"></strong>
+      </div>
+
+      <div id="round-config" class="round-config">
+        <div class="round-config-row">
+          <span class="round-config-label">Categoria:</span>
+          <div class="categories-inline" id="categories-container"></div>
+        </div>
+        <div class="round-config-row">
+          <span class="round-config-label">Tiempo:</span>
+          <div class="time-options-inline" id="time-options-container"></div>
+        </div>
       </div>
 
       <div class="timer-area">

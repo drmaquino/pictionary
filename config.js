@@ -22,7 +22,7 @@ const CONFIG = {
     maxNameLength: 20
   },
   timer: {
-    options: [30, 60, 90, 120],
+    options: [5, 30, 60, 90, 120],
     default: 60,
     warningThreshold: 20,
     dangerThreshold: 10,

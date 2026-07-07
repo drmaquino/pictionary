@@ -121,8 +121,6 @@ function initGame() {
     setupTeams.push({ name, color });
   }
   renderTeamInputs();
-  renderCategories();
-  renderTimeOptions();
 
   document.getElementById('add-team-btn').addEventListener('click', addTeam);
 }
@@ -206,9 +204,9 @@ function renderTeamInputs() {
 function renderCategories() {
   const container = document.getElementById('categories-container');
   container.innerHTML = '';
-  CONFIG.categories.forEach((cat, i) => {
+  CONFIG.categories.forEach(cat => {
     const btn = document.createElement('button');
-    btn.className = 'category-btn' + (i === 0 ? ' selected' : '');
+    btn.className = 'category-btn' + (cat.id === gameState.selectedCategory ? ' selected' : '');
     btn.dataset.category = cat.id;
     btn.textContent = cat.label;
     btn.addEventListener('click', () => {
@@ -225,13 +223,15 @@ function renderTimeOptions() {
   container.innerHTML = '';
   CONFIG.timer.options.forEach(time => {
     const btn = document.createElement('button');
-    btn.className = 'time-btn' + (time === CONFIG.timer.default ? ' selected' : '');
+    btn.className = 'time-btn' + (time === gameState.timePerTurn ? ' selected' : '');
     btn.dataset.time = time;
     btn.textContent = time + 's';
     btn.addEventListener('click', () => {
       container.querySelectorAll('.time-btn').forEach(b => b.classList.remove('selected'));
       btn.classList.add('selected');
       gameState.timePerTurn = parseInt(btn.dataset.time);
+      gameState.timeRemaining = gameState.timePerTurn;
+      timerValue.textContent = gameState.timePerTurn;
     });
     container.appendChild(btn);
   });
@@ -283,8 +283,12 @@ function startGame() {
   gameState.roundNumber = 0;
   gameState.roundHistory = [];
   gameState.usedWords.clear();
+  gameState.selectedCategory = 'todas';
+  gameState.timePerTurn = CONFIG.timer.default;
 
   renderScoreboard();
+  renderCategories();
+  renderTimeOptions();
   updateTurnDisplay();
   resetTurn();
   showScreen(gameScreen);
@@ -338,6 +342,8 @@ function resetTurn() {
   timerValue.textContent = gameState.timePerTurn;
   timerCircle.className = 'timer-circle';
 
+  // Show round config and start button
+  document.getElementById('round-config').style.display = '';
   startRoundBtn.style.display = '';
   correctBtn.style.display = 'none';
   skipBtn.style.display = 'none';
@@ -345,12 +351,18 @@ function resetTurn() {
 }
 
 function startRound() {
+  // Read current time selection (might have changed)
+  gameState.timeRemaining = gameState.timePerTurn;
+  timerValue.textContent = gameState.timePerTurn;
+
   gameState.roundNumber++;
 
   gameState.currentWord = getRandomWord();
   theWord.textContent = gameState.currentWord;
   wordDisplay.classList.remove('word-hidden');
 
+  // Hide round config, show playing controls
+  document.getElementById('round-config').style.display = 'none';
   startRoundBtn.style.display = 'none';
   correctBtn.style.display = '';
   skipBtn.style.display = '';

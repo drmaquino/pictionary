@@ -284,12 +284,51 @@ body {
   background: var(--card-bg);
   border-radius: var(--radius);
   box-shadow: var(--shadow);
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
   font-size: 1.1rem;
 }
 
 .turn-indicator strong {
   color: var(--primary);
+}
+
+/* Round config (per-round category & time selection) */
+.round-config {
+  background: var(--card-bg);
+  border-radius: var(--radius);
+  padding: 1rem 1.25rem;
+  box-shadow: var(--shadow);
+  margin-bottom: 1rem;
+}
+
+.round-config-row {
+  margin-bottom: 0.75rem;
+}
+
+.round-config-row:last-child {
+  margin-bottom: 0;
+}
+
+.round-config-label {
+  display: block;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-light);
+  margin-bottom: 0.4rem;
+}
+
+.categories-inline,
+.time-options-inline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.categories-inline .category-btn,
+.time-options-inline .time-btn {
+  padding: 0.35rem 0.75rem;
+  font-size: 0.8rem;
 }
 
 /* Word area */
