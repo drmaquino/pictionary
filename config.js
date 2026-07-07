@@ -3,11 +3,26 @@
 
 const CONFIG = {
   teams: {
-    defaultNames: ['Equipo Azul', 'Equipo Rojo'],
+    min: 1,
+    max: 4,
+    default: 2,
+    defaults: [
+      { name: 'Equipo Azul', color: '#0984e3' },
+      { name: 'Equipo Rojo', color: '#d63031' },
+      { name: 'Equipo Verde', color: '#00b894' },
+      { name: 'Equipo Naranja', color: '#e17055' }
+    ],
+    randomNames: [
+      'Los Picassos', 'Los Garabatos', 'Trazos Locos', 'Los Crayones',
+      'Manos de Tijera', 'Los Borrones', 'Arte Pop', 'Los Doodles',
+      'Pinceladas', 'Los Manchones', 'Tinta Fresca', 'Los Grafitis',
+      'Paleta Salvaje', 'Los Acuarelas', 'Carboncillo', 'Los Pixeles',
+      'Trazo Fino', 'Los Bocetos', 'Pluma Libre', 'Los Rotuladores'
+    ],
     maxNameLength: 20
   },
   timer: {
-    options: [10, 30, 60, 90, 120],
+    options: [30, 60, 90, 120],
     default: 60,
     warningThreshold: 20,
     dangerThreshold: 10,

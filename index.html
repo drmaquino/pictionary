@@ -15,16 +15,8 @@
 
       <div class="setup-section">
         <h2>Equipos</h2>
-        <div class="teams-config">
-          <div class="team-input">
-            <label for="team1-name">Equipo 1:</label>
-            <input type="text" id="team1-name">
-          </div>
-          <div class="team-input">
-            <label for="team2-name">Equipo 2:</label>
-            <input type="text" id="team2-name">
-          </div>
-        </div>
+        <div class="teams-config" id="teams-config-container"></div>
+        <button type="button" id="add-team-btn" class="add-team-btn">+ Agregar equipo</button>
       </div>
 
       <div class="setup-section">
@@ -47,7 +39,7 @@
       <div class="help-content">
         <div class="help-step">
           <span class="step-number">1</span>
-          <p>Divídanse en <strong>2 equipos</strong>. Pueden ponerle el nombre que quieran a cada uno.</p>
+          <p>Divídanse en equipos. Pueden ponerle el nombre que quieran a cada uno.</p>
         </div>
         <div class="help-step">
           <span class="step-number">2</span>
@@ -67,7 +59,7 @@
         </div>
         <div class="help-step">
           <span class="step-number">6</span>
-          <p>Cuando termina el tiempo, pasa el turno al otro equipo. Cuando quieran terminar, toquen <strong>"Finalizar Juego"</strong> para ver los resultados.</p>
+          <p>Cuando termina el tiempo, pasa el turno al siguiente equipo. Cuando quieran terminar, toquen <strong>"Finalizar Juego"</strong> para ver los resultados.</p>
         </div>
         <div class="help-rules">
           <h3>Reglas del dibujante</h3>
@@ -83,21 +75,11 @@
 
     <!-- Game Screen -->
     <section id="game-screen" class="screen">
-      <div class="scoreboard">
-        <div class="team-score" id="team1-score-display">
-          <span class="team-name" id="team1-label">Equipo Azul</span>
-          <span class="score" id="team1-score">0</span>
-        </div>
-        <div class="vs">VS</div>
-        <div class="team-score" id="team2-score-display">
-          <span class="team-name" id="team2-label">Equipo Rojo</span>
-          <span class="score" id="team2-score">0</span>
-        </div>
-      </div>
+      <div class="scoreboard" id="scoreboard"></div>
 
       <div class="turn-indicator">
         <span>Turno de: </span>
-        <strong id="current-team-name">Equipo Azul</strong>
+        <strong id="current-team-name"></strong>
       </div>
 
       <div class="timer-area">
@@ -133,28 +115,14 @@
     <!-- Results Screen -->
     <section id="results-screen" class="screen">
       <div class="results-content">
-        <h1 class="results-title" id="results-title">Resultados</h1>
+        <h1 class="results-title">Resultados</h1>
         <div id="results-winner" class="results-winner"></div>
-
-        <div class="results-totals">
-          <div class="result-total team1-total">
-            <span class="result-team-name" id="results-team1-name">Equipo Azul</span>
-            <span class="result-team-score" id="results-team1-total">0</span>
-          </div>
-          <div class="result-total team2-total">
-            <span class="result-team-name" id="results-team2-name">Equipo Rojo</span>
-            <span class="result-team-score" id="results-team2-total">0</span>
-          </div>
-        </div>
+        <div class="results-totals" id="results-totals"></div>
 
         <div class="results-rounds">
           <h3>Detalle por ronda</h3>
           <div class="rounds-table">
-            <div class="rounds-header">
-              <span>Ronda</span>
-              <span id="rounds-header-team1">Eq. Azul</span>
-              <span id="rounds-header-team2">Eq. Rojo</span>
-            </div>
+            <div class="rounds-header" id="rounds-header"></div>
             <div id="rounds-body"></div>
           </div>
         </div>

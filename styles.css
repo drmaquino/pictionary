@@ -7,10 +7,9 @@
 :root {
   --primary: #6c5ce7;
   --primary-dark: #5a4bd1;
-  --team1-color: #0984e3;
-  --team2-color: #d63031;
   --success: #00b894;
   --warning: #fdcb6e;
+  --danger: #d63031;
   --bg: #f8f9fa;
   --card-bg: #ffffff;
   --text: #2d3436;
@@ -80,6 +79,7 @@ body {
   margin-bottom: 1rem;
 }
 
+/* Team name inputs */
 .teams-config {
   display: flex;
   flex-direction: column;
@@ -89,12 +89,20 @@ body {
 .team-input {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.5rem;
 }
 
 .team-input label {
-  font-weight: 600;
-  min-width: 80px;
+  display: flex;
+  align-items: center;
+}
+
+.team-color-dot {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  flex-shrink: 0;
 }
 
 .team-input input {
@@ -111,17 +119,53 @@ body {
   border-color: var(--primary);
 }
 
+.delete-team-btn {
+  width: 36px;
+  height: 36px;
+  border: none;
+  background: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: background 0.2s;
+  flex-shrink: 0;
+  opacity: 0.5;
+}
+
+.delete-team-btn:hover {
+  background: #fee2e2;
+  opacity: 1;
+}
+
+.add-team-btn {
+  display: block;
+  width: 100%;
+  margin-top: 0.75rem;
+  padding: 0.6rem;
+  border: 2px dashed #ccc;
+  border-radius: 8px;
+  background: none;
+  color: var(--text-light);
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.add-team-btn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+/* Category and time option buttons */
 .categories,
-.time-options,
-.points-options {
+.time-options {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
 }
 
 .category-btn,
-.time-btn,
-.points-btn {
+.time-btn {
   padding: 0.5rem 1rem;
   border: 2px solid #e0e0e0;
   border-radius: 20px;
@@ -132,20 +176,19 @@ body {
 }
 
 .category-btn:hover,
-.time-btn:hover,
-.points-btn:hover {
+.time-btn:hover {
   border-color: var(--primary);
   color: var(--primary);
 }
 
 .category-btn.selected,
-.time-btn.selected,
-.points-btn.selected {
+.time-btn.selected {
   background: var(--primary);
   border-color: var(--primary);
   color: white;
 }
 
+/* Buttons */
 .primary-btn {
   display: block;
   width: 100%;
@@ -188,13 +231,14 @@ body {
   color: var(--text);
 }
 
-/* Game Screen */
+/* Game Screen - Scoreboard */
 .scoreboard {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 1.5rem;
+  gap: 0.75rem;
   margin-bottom: 1rem;
+  flex-wrap: wrap;
 }
 
 .team-score {
@@ -202,18 +246,12 @@ body {
   flex-direction: column;
   align-items: center;
   background: var(--card-bg);
-  padding: 1rem 1.5rem;
+  padding: 0.75rem 1rem;
   border-radius: var(--radius);
   box-shadow: var(--shadow);
-  min-width: 120px;
-}
-
-#team1-score-display {
-  border-top: 4px solid var(--team1-color);
-}
-
-#team2-score-display {
-  border-top: 4px solid var(--team2-color);
+  min-width: 90px;
+  border-top: 4px solid;
+  transition: transform 0.2s, box-shadow 0.2s;
 }
 
 .team-score.active-team {
@@ -222,30 +260,24 @@ body {
 }
 
 .team-name {
-  font-size: 0.85rem;
-  color: var(--text-light);
+  font-size: 0.75rem;
   margin-bottom: 0.25rem;
+  font-weight: 600;
+  text-align: center;
 }
 
 .score {
-  font-size: 2.5rem;
+  font-size: 2rem;
   font-weight: 700;
-}
-
-#team1-score-display .score {
-  color: var(--team1-color);
-}
-
-#team2-score-display .score {
-  color: var(--team2-color);
 }
 
 .vs {
   font-weight: 700;
   color: var(--text-light);
-  font-size: 1rem;
+  font-size: 0.85rem;
 }
 
+/* Turn indicator */
 .turn-indicator {
   text-align: center;
   padding: 0.75rem;
@@ -260,6 +292,7 @@ body {
   color: var(--primary);
 }
 
+/* Word area */
 .word-area {
   background: var(--card-bg);
   border-radius: var(--radius);
@@ -293,13 +326,7 @@ body {
   user-select: none;
 }
 
-.word-hint {
-  font-size: 0.8rem;
-  color: var(--text-light);
-  margin-top: 0.5rem;
-  font-style: italic;
-}
-
+/* Timer */
 .timer-area {
   display: flex;
   justify-content: center;
@@ -327,7 +354,7 @@ body {
 }
 
 .timer-circle.danger {
-  border-color: var(--team2-color);
+  border-color: var(--danger);
   animation: pulse 0.3s infinite alternate;
 }
 
@@ -341,6 +368,7 @@ body {
   font-weight: 700;
 }
 
+/* Game action buttons */
 .game-controls {
   display: flex;
   gap: 0.75rem;
@@ -361,23 +389,6 @@ body {
 .action-btn:disabled {
   opacity: 0.4;
   cursor: not-allowed;
-}
-
-.reveal-btn {
-  background: var(--primary);
-  color: white;
-}
-
-.reveal-btn:hover:not(:disabled) {
-  background: var(--primary-dark);
-}
-
-.reveal-btn.hide-mode {
-  background: #636e72;
-}
-
-.reveal-btn.hide-mode:hover:not(:disabled) {
-  background: #4a5459;
 }
 
 .timer-btn {
@@ -407,6 +418,7 @@ body {
   background: #4a5459;
 }
 
+/* Round summary */
 .round-summary {
   background: var(--card-bg);
   border-radius: var(--radius);
@@ -424,6 +436,17 @@ body {
 .round-summary strong {
   color: var(--primary);
   font-size: 1.5rem;
+}
+
+.bottom-controls {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.bottom-controls .secondary-btn {
+  flex: 1;
+  margin-top: 0;
 }
 
 /* Results Screen */
@@ -455,25 +478,11 @@ body {
   display: inline-block;
 }
 
-.results-winner.winner-team1 {
-  color: var(--team1-color);
-  background: rgba(9, 132, 227, 0.1);
-}
-
-.results-winner.winner-team2 {
-  color: var(--team2-color);
-  background: rgba(214, 48, 49, 0.1);
-}
-
-.results-winner.winner-tie {
-  color: var(--primary);
-  background: rgba(108, 92, 231, 0.1);
-}
-
 .results-totals {
   display: flex;
   justify-content: center;
-  gap: 2rem;
+  flex-wrap: wrap;
+  gap: 1rem;
   margin-bottom: 1.5rem;
 }
 
@@ -481,37 +490,23 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 1rem 1.5rem;
+  padding: 1rem 1.25rem;
   border-radius: var(--radius);
   border: 2px solid #e0e0e0;
-}
-
-.result-total.team1-total {
-  border-color: var(--team1-color);
-}
-
-.result-total.team2-total {
-  border-color: var(--team2-color);
+  border-left: 4px solid;
+  min-width: 100px;
 }
 
 .result-team-name {
-  font-size: 0.85rem;
-  color: var(--text-light);
+  font-size: 0.8rem;
+  font-weight: 600;
   margin-bottom: 0.25rem;
 }
 
 .result-team-score {
-  font-size: 2.5rem;
+  font-size: 2.2rem;
   font-weight: 700;
   color: var(--text);
-}
-
-.team1-total .result-team-score {
-  color: var(--team1-color);
-}
-
-.team2-total .result-team-score {
-  color: var(--team2-color);
 }
 
 .results-rounds {
@@ -536,14 +531,13 @@ body {
 .rounds-header,
 .rounds-row {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
   text-align: center;
   padding: 0.5rem 0;
 }
 
 .rounds-header {
   font-weight: 700;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   color: var(--text-light);
   border-bottom: 2px solid #f0f0f0;
   margin-bottom: 0.25rem;
@@ -637,7 +631,7 @@ body {
 
 .help-rules h3 {
   font-size: 1rem;
-  color: var(--team2-color);
+  color: var(--danger);
   margin-bottom: 0.75rem;
 }
 
@@ -655,22 +649,11 @@ body {
 }
 
 .help-rules li::before {
-  content: '✕';
+  content: '\2715';
   position: absolute;
   left: 0;
-  color: var(--team2-color);
+  color: var(--danger);
   font-weight: 700;
-}
-
-.bottom-controls {
-  display: flex;
-  gap: 0.75rem;
-  margin-top: 1rem;
-}
-
-.bottom-controls .secondary-btn {
-  flex: 1;
-  margin-top: 0;
 }
 
 /* Responsive */
@@ -680,12 +663,24 @@ body {
   }
 
   .scoreboard {
-    gap: 0.75rem;
+    gap: 0.5rem;
   }
 
   .team-score {
-    padding: 0.75rem 1rem;
-    min-width: 100px;
+    padding: 0.5rem 0.75rem;
+    min-width: 70px;
+  }
+
+  .team-name {
+    font-size: 0.65rem;
+  }
+
+  .score {
+    font-size: 1.6rem;
+  }
+
+  .vs {
+    font-size: 0.7rem;
   }
 
   .the-word {
@@ -694,5 +689,14 @@ body {
 
   .game-controls {
     flex-direction: column;
+  }
+
+  .results-totals {
+    gap: 0.75rem;
+  }
+
+  .result-total {
+    padding: 0.75rem 1rem;
+    min-width: 80px;
   }
 }
